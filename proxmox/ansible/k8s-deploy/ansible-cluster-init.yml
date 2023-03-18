@@ -1,0 +1,73 @@
+---
+ #initialize the cluster
+- name: configure control node
+  hosts: k8s_control
+  remote_user: terraform
+  become: yes
+  tasks:
+    - name: register IP address for init 
+      shell: hostname -I | awk '{print $1}'
+      register: init_hostname
+    
+    - name: Start the cluster
+      shell: sudo kubeadm init --control-plane-endpoint="{{ init_hostname.stdout }}"
+
+    - name: kube config 
+      shell: |
+              mkdir -p $HOME/.kube
+              sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+              sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+    - name: join command
+      shell: kubeadm token create --print-join-command
+      register: kubernetes_join_command
+
+    - name: Copy join command to local file.
+      become: yes
+      local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command" mode=0777
+
+    - name: install calico 
+      shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
+
+    - name: wait for 10 seconds to allow actions to clear 
+      pause:
+        seconds: 10
+
+ #final step to join workers to cluster afer init
+- name: join workers to controller
+  hosts: k8s_worker
+  become: yes
+  remote_user: terraform
+  gather_facts: yes
+  tasks:
+   - name: Copy join command from Ansiblehost to the worker nodes.
+     become: yes
+     copy:
+       src: /Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command
+       dest: /tmp/kubernetes_join_command
+       mode: 0777
+
+   - name: Join the Worker nodes to the cluster.
+     become: yes
+     command: sh /tmp/kubernetes_join_command
+     register: joined_or_not
+
+   - name: read file to join worker nodes to cluster
+     become: yes
+     shell: |
+             cat /tmp/kubernetes_join_command
+     register: join_command
+
+   - name: Print the file content to a console
+     debug:
+       msg: "{{ join_command.stdout }}"
+ 
+   - name: wait for 10 seconds to clear out actions
+     pause:
+       seconds: 10
+   
+   - name: delete join file
+     delegate_to: localhost
+     command: rm /Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command
+     run_once: yes
+...
