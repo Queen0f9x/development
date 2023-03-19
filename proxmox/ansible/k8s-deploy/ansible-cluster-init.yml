@@ -17,13 +17,15 @@
               mkdir -p $HOME/.kube
               cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
               chown $(id -u):$(id -g) $HOME/.kube/config
-
+    
+    - name: create new local kube config
+      local_action: copy content="$HOME/.kube/config" dest="/Users/creedperry/.kube/proxmox-config" mode=0777
+    
     - name: join command
       shell: kubeadm token create --print-join-command
       register: kubernetes_join_command
 
     - name: Copy join command to local file.
-      become: yes
       local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/Users/creedperry/Documents/GitHub/development/proxmox/ansible/k8s-deploy/kubernetes_join_command" mode=0777
 
     - name: install calico 
@@ -41,19 +43,16 @@
   gather_facts: yes
   tasks:
    - name: Copy join command from Ansiblehost to the worker nodes.
-     become: yes
      copy:
        src: /Users/creedperry/Documents/GitHub/development/proxmox/ansible/k8s-deploy/kubernetes_join_command
        dest: /tmp/kubernetes_join_command
        mode: 0777
 
    - name: Join the Worker nodes to the cluster.
-     become: yes
      command: sh /tmp/kubernetes_join_command
      register: joined_or_not
 
    - name: read file to join worker nodes to cluster
-     become: yes
      shell: |
              cat /tmp/kubernetes_join_command
      register: join_command
