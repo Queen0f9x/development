@@ -15,8 +15,8 @@
     - name: kube config 
       shell: |
               mkdir -p $HOME/.kube
-              sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-              sudo chown $(id -u):$(id -g) $HOME/.kube/config
+              cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+              chown $(id -u):$(id -g) $HOME/.kube/config
 
     - name: join command
       shell: kubeadm token create --print-join-command
@@ -24,14 +24,14 @@
 
     - name: Copy join command to local file.
       become: yes
-      local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command" mode=0777
+      local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/Users/creedperry/Documents/GitHub/development/proxmox/ansible/k8s-deploy/kubernetes_join_command" mode=0777
 
     - name: install calico 
       shell: kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.0/manifests/calico.yaml
 
-    - name: wait for 10 seconds to allow actions to clear 
+    - name: wait for 5 seconds to allow actions to clear 
       pause:
-        seconds: 10
+        seconds: 5
 
  #final step to join workers to cluster afer init
 - name: join workers to controller
@@ -43,7 +43,7 @@
    - name: Copy join command from Ansiblehost to the worker nodes.
      become: yes
      copy:
-       src: /Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command
+       src: /Users/creedperry/Documents/GitHub/development/proxmox/ansible/k8s-deploy/kubernetes_join_command
        dest: /tmp/kubernetes_join_command
        mode: 0777
 
@@ -68,6 +68,6 @@
    
    - name: delete join file
      delegate_to: localhost
-     command: rm /Users/creedperry/bitbucket/proxmox/ansible/k8s-deploy/kubernetes_join_command
+     command: rm /Users/creedperry/Documents/GitHub/development/proxmox/ansible/k8s-deploy/kubernetes_join_command
      run_once: yes
 ...
