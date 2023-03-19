@@ -53,5 +53,8 @@ Thumbs.db
 #terraform providers
 **/.terraform/providers
 
+#tfstate files
+terraform.tfstate*
+
 #ansible hosts file
 ansible-hosts.txt
