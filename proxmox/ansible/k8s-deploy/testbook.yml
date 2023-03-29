@@ -1,0 +1,16 @@
+- name: configure control node
+  hosts: k8s_control
+  remote_user: terraform
+  become: yes
+  tasks:  
+    - name: delete old local config file
+      delegate_to: localhost
+      command: rm /Users/creedperry/.kube/proxmox-config
+      run_once: yes
+    
+    - name: create new local kube config
+      fetch:
+        src: /home/terraform/.kube/config
+        dest: /Users/creedperry/.kube/proxmox-config
+        flat: yes
+      run_once: yes

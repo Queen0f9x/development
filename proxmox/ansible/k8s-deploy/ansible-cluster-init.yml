@@ -14,12 +14,21 @@
 
     - name: kube config 
       shell: |
-              mkdir -p $HOME/.kube
-              cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-              chown $(id -u):$(id -g) $HOME/.kube/config
+              mkdir -p /home/terraform/.kube
+              cp -i /etc/kubernetes/admin.conf /home/terraform/.kube/config
+              chown $(id -u):$(id -g) /home/terraform/.kube/config
+    
+    - name: delete old local config file
+      delegate_to: localhost
+      command: rm /Users/creedperry/.kube/proxmox-config
+      run_once: yes
     
     - name: create new local kube config
-      local_action: copy content="$HOME/.kube/config" dest="/Users/creedperry/.kube/proxmox-config" mode=0777
+      fetch:
+        src: /home/terraform/.kube/config
+        dest: /Users/creedperry/.kube/proxmox-config
+        flat: yes
+      run_once: yes
     
     - name: join command
       shell: kubeadm token create --print-join-command
