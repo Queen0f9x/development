@@ -1,6 +1,6 @@
 resource "proxmox_vm_qemu" "microk8s_node" {
   count                  = 1
-  name                   = "k8s-control"
+  name                   = "microk8s"
   target_node            = var.proxmox_host
   clone                  = var.template_name
   full_clone             = true

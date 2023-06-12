@@ -1,6 +1,6 @@
 resource "proxmox_vm_qemu" "pcr_node" {
   count                  = 1
-  name                   = "k8s-control"
+  name                   = "pve_container_registry"
   target_node            = var.proxmox_host
   clone                  = var.template_name
   full_clone             = true
