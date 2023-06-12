@@ -1,34 +1,19 @@
-resource "proxmox_vm_qemu" "microk8s_node" {
-  count                  = 1
-  name                   = "k8s-control"
-  target_node            = var.proxmox_host
-  clone                  = var.template_name
-  full_clone             = true
-  agent                  = 1
-  os_type                = "cloud-init"
-  cores                  = 2
-  sockets                = 1
-  cpu                    = "host"
-  memory                 = 2048
-  scsihw                 = "virtio-scsi-single"
-  bootdisk               = "scsi0"
-  ipconfig0              = "ip=dhcp"
-  automatic_reboot       = true
+terraform {
+  required_version = ">= 0.13.0"
 
-  vga {
-    type = "serial0"
+  required_providers {
+    proxmox = {
+      source  = "telmate/proxmox"
+      version = "2.9.11"
+    }
   }
-  
-  disk {
-    slot     = 0
-    size     = "8G"
-    type     = "scsi"
-    storage  = "local-lvm"
-    iothread = 1
-  }
+}
 
-  network {
-    model  = "virtio"
-    bridge = "vmbr0"
-  }
+provider "proxmox" {
+  pm_api_url          = var.api_url
+  pm_api_token_id     = var.api_token_id
+  pm_api_token_secret = var.api_token
+  pm_timeout          = 800
+  pm_parallel         = 1
+  pm_tls_insecure     = true
 }
