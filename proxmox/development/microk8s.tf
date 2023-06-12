@@ -9,7 +9,7 @@ resource "proxmox_vm_qemu" "microk8s_node" {
   cores                  = 2
   sockets                = 1
   cpu                    = "host"
-  memory                 = 2048
+  memory                 = 4096
   scsihw                 = "virtio-scsi-single"
   bootdisk               = "scsi0"
   ipconfig0              = "ip=dhcp"

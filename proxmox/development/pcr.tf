@@ -9,7 +9,7 @@ resource "proxmox_vm_qemu" "pcr_node" {
   cores                  = 1
   sockets                = 1
   cpu                    = "host"
-  memory                 = 2048
+  memory                 = 1024
   scsihw                 = "virtio-scsi-single"
   bootdisk               = "scsi0"
   ipconfig0              = "ip=dhcp"
