@@ -21,7 +21,7 @@ resource "proxmox_vm_qemu" "pcr_node" {
   
   disk {
     slot     = 0
-    size     = "8G"
+    size     = "12G"
     type     = "scsi"
     storage  = "local-lvm"
     iothread = 1
