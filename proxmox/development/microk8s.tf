@@ -21,7 +21,7 @@ resource "proxmox_vm_qemu" "microk8s_node" {
   
   disk {
     slot     = 0
-    size     = "8G"
+    size     = "20G"
     type     = "scsi"
     storage  = "local-lvm"
     iothread = 1
