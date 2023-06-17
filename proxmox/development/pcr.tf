@@ -1,12 +1,12 @@
 resource "proxmox_vm_qemu" "pcr_node" {
   count                  = 1
-  name                   = "pve_container_registry"
+  name                   = "pve-container-registry"
   target_node            = var.proxmox_host
   clone                  = var.template_name
   full_clone             = true
   agent                  = 1
   os_type                = "cloud-init"
-  cores                  = 1
+  cores                  = 2
   sockets                = 1
   cpu                    = "host"
   memory                 = 1024
