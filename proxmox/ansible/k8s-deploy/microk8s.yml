@@ -1,0 +1,54 @@
+- name: configure control node
+  hosts: microk8s
+  remote_user: terraform
+  become: yes
+  tasks:
+    - name: Install docker
+      apt:
+        name: docker.io
+        update_cache: true
+        cache_valid_time: 86400
+        state: present
+
+    - name: wait for 2 seconds to allow actions to clear 
+      pause:
+        seconds: 2
+
+    - name: Install microk8s
+      snap:
+        name: microk8s
+        state: present
+        classic: yes
+
+    - name: Add user to Docker and Microk8s groups
+      user:
+        name: '{{ lookup("env", "USER") }}'
+        state: present
+        groups:
+          - docker
+          - microk8s
+        append: true
+
+    - name: grant terraform permissions
+      command: sudo usermod -a -G terraform
+
+    - name: kube config permissions
+      command: sudo chown -f -R terraform ~/.kube
+    
+    - name: setup addons
+      command: microk8s enable community
+
+    - name: enable ingress
+      command: microk8s enable ingress
+    
+    - name: delete old local config file
+      delegate_to: localhost
+      command: rm /Users/creedperry/.kube/proxmox-config
+      run_once: yes
+    
+    - name: create new local kube config
+      fetch:
+        src: /var/snap/microk8s/current/credentials/client.config
+        dest: /Users/creedperry/.kube/proxmox-config
+        flat: yes
+      run_once: yes
