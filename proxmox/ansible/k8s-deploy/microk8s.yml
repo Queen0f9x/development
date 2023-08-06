@@ -15,10 +15,7 @@
         seconds: 2
 
     - name: Install microk8s
-      snap:
-        name: microk8s
-        state: present
-        classic: yes
+      command: sudo snap install microk8s --classic
 
     - name: Add user to Docker and Microk8s groups
       user:
@@ -28,12 +25,6 @@
           - docker
           - microk8s
         append: true
-
-    - name: grant terraform permissions
-      command: sudo usermod -a -G terraform
-
-    - name: kube config permissions
-      command: sudo chown -f -R terraform ~/.kube
     
     - name: setup addons
       command: microk8s enable community
