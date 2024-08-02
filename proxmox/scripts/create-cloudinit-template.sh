@@ -1,10 +1,10 @@
 #!/bin/bash
 
-imageURL=https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-22.04-minimal-cloudimg-amd64.img
-imageName="ubuntu-22.04-minimal-cloudimg-amd64.img"
+imageURL=https://cloud-images.ubuntu.com/minimal/releases/jammy/release/ubuntu-24.04-minimal-cloudimg-amd64.img
+imageName="ubuntu-24.04-minimal-cloudimg-amd64.img"
 volumeName="local-lvm"
 virtualMachineId="700"
-templateName="jammy-template"
+templateName="noble-template"
 tmp_cores="1"
 tmp_memory="1024"
 disk_size="8G"
